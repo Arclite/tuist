@@ -25,6 +25,7 @@ public enum Product: String, CustomStringConvertible, CaseIterable, Codable {
     case systemExtension = "system_extension"
     case extensionKitExtension = "extension_kit_extension"
     case macro
+    case automatorAction
 
     public var caseValue: String {
         switch self {
@@ -76,6 +77,8 @@ public enum Product: String, CustomStringConvertible, CaseIterable, Codable {
             return "extensionKitExtension"
         case .macro:
             return "macro"
+        case .automatorAction:
+             return "automatorAction"
         }
     }
 
@@ -129,6 +132,8 @@ public enum Product: String, CustomStringConvertible, CaseIterable, Codable {
             return "extensionKit extension"
         case .macro:
             return "Swift Macro"
+        case .automatorAction:
+             return "Automator action"
         }
     }
 
@@ -146,7 +151,8 @@ public enum Product: String, CustomStringConvertible, CaseIterable, Codable {
             .tvTopShelfExtension,
             .watch2Extension,
             .extensionKitExtension,
-            .macro:
+            .macro,
+            .automatorAction:
             return true
         case
             .bundle,

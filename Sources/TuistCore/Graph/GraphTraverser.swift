@@ -1098,6 +1098,7 @@ public class GraphTraverser: GraphTraversing {
             .watch2Extension,
             .systemExtension,
             .xpc,
+            .automatorAction,
         ]
         return validProducts.contains(target.product)
     }

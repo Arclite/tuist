@@ -176,6 +176,17 @@ final class BuildPhaseGenerator: BuildPhaseGenerating {
             fileElements: fileElements,
             pbxproj: pbxproj
         )
+
+        if target.canEmbedAutomatorActions() {
+            try generateEmbedAutomatorActionBuildPhase(
+                path: path,
+                target: target,
+                graphTraverser: graphTraverser,
+                pbxTarget: pbxTarget,
+                fileElements: fileElements,
+                pbxproj: pbxproj
+            )
+        }
     }
 
     func generateScripts(
@@ -763,5 +774,37 @@ final class BuildPhaseGenerator: BuildPhaseGenerating {
 
         pbxBuildFiles.forEach { pbxproj.add(object: $0) }
         extensionKitExtensionsBuildPhase.files = pbxBuildFiles
+    }
+
+    func generateEmbedAutomatorActionBuildPhase(
+        path: AbsolutePath,
+        target: Target,
+        graphTraverser: GraphTraversing,
+        pbxTarget: PBXTarget,
+        fileElements: ProjectFileElements,
+        pbxproj: PBXProj
+    ) throws {
+        let targetDependencies = graphTraverser.directLocalTargetDependencies(path: path, name: target.name).sorted()
+        let automatorActions = targetDependencies.filter { $0.target.isEmbeddableAutomatorAction() }
+        guard !automatorActions.isEmpty else { return }
+
+        let embedAutomatorActionBuildPhase = PBXCopyFilesBuildPhase(
+            dstPath: "$(CONTENTS_FOLDER_PATH)/Library/Automator",
+            dstSubfolderSpec: .productsDirectory,
+            name: "Embed Automator Actions"
+        )
+        pbxproj.add(object: embedAutomatorActionBuildPhase)
+        pbxTarget.buildPhases.append(embedAutomatorActionBuildPhase)
+
+        let pbxBuildFiles: [PBXBuildFile] = automatorActions.compactMap { appTargetReference in
+            guard let fileReference = fileElements.product(target: appTargetReference.target.name) else { return nil }
+
+            let pbxBuildFile = PBXBuildFile(file: fileReference, settings: ["ATTRIBUTES": ["RemoveHeadersOnCopy", "CodeSignOnCopy"]])
+            pbxBuildFile.applyCondition(appTargetReference.condition, applicableTo: target)
+            return pbxBuildFile
+        }
+
+        pbxBuildFiles.forEach { pbxproj.add(object: $0) }
+        embedAutomatorActionBuildPhase.files = pbxBuildFiles
     }
 }

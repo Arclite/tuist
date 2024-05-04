@@ -106,7 +106,7 @@ final class InfoPlistContentProvider: InfoPlistContentProviding {
             packageType = "APPL"
         case .staticLibrary, .dynamicLibrary:
             packageType = nil
-        case .uiTests, .unitTests, .bundle:
+        case .uiTests, .unitTests, .bundle, .automatorAction:
             packageType = "BNDL"
         case .staticFramework, .framework:
             packageType = "FMWK"

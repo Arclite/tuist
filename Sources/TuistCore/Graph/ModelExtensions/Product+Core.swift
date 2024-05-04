@@ -53,6 +53,8 @@ extension Product {
             return .systemExtension
         case .extensionKitExtension:
             return .extensionKitExtension
+        case .automatorAction:
+            return .bundle
         }
     }
 }
